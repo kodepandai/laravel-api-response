@@ -17,8 +17,7 @@ By default, the stucture of the API response looks like this:
 }
 ```
 
-*Note: For now, if you want to customize the response structure, you need
-to manually extend the `ApiResponse` class and change the structure yourself.
+>**Note**: For now, if you want to customize the response structure, you need to manually extend the `ApiResponse` class and overide the `toResponse` method.
 
 ## Install
 
