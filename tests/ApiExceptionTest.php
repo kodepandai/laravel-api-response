@@ -3,7 +3,6 @@
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Validator;
 use KodePandai\ApiResponse\ApiResponse;
 use KodePandai\ApiResponse\Exceptions\ApiException;
 use KodePandai\ApiResponse\Exceptions\ApiValidationException;
