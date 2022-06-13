@@ -1,0 +1,77 @@
+name: "Run Tests"
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - laravel: 9.*
+            php: 8.1
+            testbench: ^7.0
+            stability: prefer-stable
+          - laravel: 9.*
+            php: 8.1
+            testbench: ^7.0
+            stability: prefer-lowest
+          - laravel: 9.*
+            php: 8.0
+            testbench: ^7.0
+            stability: prefer-stable
+          - laravel: 9.*
+            php: 8.0
+            testbench: ^7.0
+            stability: prefer-lowest
+          - laravel: 8.*
+            php: 8.0
+            testbench: ^6.0
+            stability: prefer-stable
+          - laravel: 8.*
+            php: 8.0
+            testbench: ^6.0
+            stability: prefer-lowest
+          - laravel: 8.*
+            php: 7.4
+            testbench: ^6.0
+            stability: prefer-stable
+          - laravel: 8.*
+            php: 7.4
+            testbench: ^6.0
+            stability: prefer-lowest
+          - laravel: 7.*
+            php: 7.4
+            testbench: ^5.0
+            stability: prefer-stable
+          - laravel: 7.*
+            php: 7.4
+            testbench: ^5.0
+            stability: prefer-lowest
+          - laravel: 7.*
+            php: 7.3
+            testbench: ^5.0
+            stability: prefer-stable
+          - laravel: 7.*
+            php: 7.3
+            testbench: ^5.0
+            stability: prefer-lowest
+            #
+    name: Laravel ${{ matrix.laravel }} with PHP ${{ matrix.php }} - ${{ matrix.stability }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: zip, pdo, sqlite, pdo_sqlite
+          coverage: none
+      - name: Install dependencies
+        run: |
+          composer require "laravel/framework:${{ matrix.laravel }}" \
+            "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
+          composer update --${{ matrix.stability }} --prefer-dist --no-interaction
+      - name: Execute tests
+        run: composer pest

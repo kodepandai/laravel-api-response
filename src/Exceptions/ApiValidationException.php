@@ -3,26 +3,32 @@
 namespace KodePandai\ApiResponse\Exceptions;
 
 use Illuminate\Http\Response;
-use InvalidArgumentException;
 use KodePandai\ApiResponse\ApiResponse;
 
 class ApiValidationException extends ApiException
 {
-    public function __construct(public array $errors = [])
+    /**
+     * Throw a validation error api exception.
+     *
+     * @param array $errors The errors
+     */
+    public function __construct(array $errors = [])
     {
-        $valuesNotArray = array_filter($errors, fn ($key) => ! is_array($key));
-
-        if (count($valuesNotArray) > 0) {
-            throw new InvalidArgumentException('Invalid $errors format');
-        }
+        parent::__construct(
+            'The given data was invalid.',
+            Response::HTTP_UNPROCESSABLE_ENTITY,
+            $errors
+        );
     }
 
-    public function toResponse($request)
+    /**
+     * Get the response.
+     */
+    public function getResponse(): ApiResponse
     {
         return ApiResponse::error($this->errors)
-            ->title('Validation Error')
-            ->message('The given data was invalid.')
-            ->status(Response::HTTP_UNPROCESSABLE_ENTITY)
-            ->toResponse($request);
+        ->title('Validation Error')
+        ->message($this->getMessage())
+        ->statusCode($this->getStatusCode());
     }
 }
