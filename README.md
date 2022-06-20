@@ -22,7 +22,7 @@ By default, the stucture of the API response looks like this:
 ## Install
 
 ```sh
-$ composer install kodepandai/laravel-api-response
+$ composer require kodepandai/laravel-api-response
 ```
 
 ## Usage
