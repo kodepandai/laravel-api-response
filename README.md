@@ -5,7 +5,7 @@ a simple and structured way.
 
 By default, the stucture of the API response looks like this:
 
-```jsonp
+```jsonc
 {
   "success": true,
   "title": "Users",
@@ -17,7 +17,8 @@ By default, the stucture of the API response looks like this:
 }
 ```
 
->**Note**: For now, if you want to customize the response structure, you need to manually extend the `ApiResponse` class and overide the `toResponse` method.
+>**Note**: For now, if you want to customize the response structure, you need to manually extend `ApiResponse` 
+> class and override `toResponse` or `getResponse` method.
 
 ## Install
 
@@ -65,8 +66,6 @@ ApiResponse::error(['email' => ['The email field is required.']])
 ApiResponse::error()
            ->statusCode(Response::HTTP_SERVICE_UNAVAILABLE)
            ->message('Out of service, please comeback later.');
-
-ApiResponse::
 ```
 
 ### Validate or Fail
