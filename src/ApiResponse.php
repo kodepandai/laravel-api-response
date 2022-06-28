@@ -121,7 +121,8 @@ class ApiResponse extends Fluent implements Responsable
         array $messages = [],
         array $customAttributes = [],
         Request $request = null
-    ): void {
+    ): array {
+        //.
         $request = $request ?: app(Request::class);
 
         $validator = Validator::make($request->all(), $rules, $messages, $customAttributes);
@@ -129,6 +130,8 @@ class ApiResponse extends Fluent implements Responsable
         if ($validator->fails()) {
             throw new ApiValidationException($validator->errors()->toArray());
         }
+
+        return $validator->validated();
     }
 
     /**
