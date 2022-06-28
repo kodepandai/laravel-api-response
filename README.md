@@ -17,8 +17,8 @@ By default, the stucture of the API response looks like this:
 }
 ```
 
->**Note**: For now, if you want to customize the response structure, you need to manually extend `ApiResponse` 
-> class and override `toResponse` or `getResponse` method.
+> **Note**: For now, if you want to customize the response structure,
+> you need to manually extend `ApiResponse` class and override `toResponse` method.
 
 ## Install
 
@@ -70,8 +70,9 @@ ApiResponse::error()
 
 ### Validate or Fail
 
-Use this helper to validate user submitted request then return 
+Use this helper to validate user submitted request, then return 
 an `ApiResponse::error` response if the validation fails. 
+
 With this helper, now you can use something like `$request->validate()` 
 without worrying on how to handle the redirect response or validation errors 
 separately.
@@ -93,8 +94,9 @@ if ($validator->fails()) {
 
 // with this helper
 
-// it will automatically return a json response  if validation fails
-ApiResponse::validateOrFail([
+// it will automatically return a json response if validation fails
+// if the validation passes, it will return validated data
+$validatedData = ApiResponse::validateOrFail([
     'email' => 'required|email',
     'username' => 'required|unique:users,username',
 ]);
@@ -103,7 +105,7 @@ ApiResponse::validateOrFail([
 ### Throwing an Exception
 
 Instead of using `ApiResponse` manually, you can also throw an exception 
-and got the same response according to the exception type.
+and will get the same response according to the exception type.
 
 This package provides two exception: `ApiException` and `ApiValidationException`.
 
@@ -120,6 +122,37 @@ if ($user->balance <= 100_000) {
 }
 ```
 
+### Handling all Exception
+
+If you would like to convert all laravel exception to return an ApiResponse,
+you can use the `ExceptionHandler::renderAsApiResponse` helper.
+
+```php
+// file: Exception/Handler.php
+
+use KodePandai\ApiResponse\ExceptionHandler;
+
+// new laravel (>= 8)
+public function register()
+{
+    $this->renderable(function (Throwable $e, $request) {
+        if ($request->wantsJson()) {
+            return ExceptionHandler::renderAsApiResponse($e);
+        }
+    });
+}
+
+// old laravel (<= 7)
+public function render($request, Throwable $exception)
+{
+    if ($request->wantsJson()) {
+        return ExceptionHandler::renderAsApiResponse($exception);
+    }
+
+    return parent::render($request, $exception);
+}
+```
+
 ## Develop
 
-* To test, run `composer test`.
+* To test run `composer test`.

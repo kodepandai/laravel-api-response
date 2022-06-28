@@ -2,7 +2,18 @@
 
 All notable changes to `laravel-api-response` will be documented in this file.
 
-## [v1.0.0](https://github.com/kodepandai/laravel-indonesia/compare/b5f439...v1.0.0) - 13 Jun 2022
+## [v1.1.0](https://github.com/kodepandai/laravel-api-response/compare/v1.0.0...v1.1.0) - 28 Jun 2022
+
+### Fixed
+
+- Missing return type for `ApiException` ([#4](https://github.com/kodepandai/laravel-api-response/pull/4))
+
+### Added
+
+- Return type for `validateOrFail`
+- `ExceptionHandler::renderAsApiResponse` helper
+
+## [v1.0.0](https://github.com/kodepandai/laravel-api-response/compare/b5f439...v1.0.0) - 13 Jun 2022
 
 ### Added
 
