@@ -35,15 +35,15 @@ class ApiException extends HttpException implements Responsable, Renderable
     /**
      * Convert exception to json response.
      */
-    public function toResponse($request)
+    public function toResponse($request): ApiResponse
     {
-        $this->getResponse();
+        return $this->getResponse();
     }
 
     /**
      * Render exception as json response.
      */
-    public function render()
+    public function render(): ApiResponse
     {
         return $this->getResponse();
     }
