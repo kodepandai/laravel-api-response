@@ -3,18 +3,16 @@
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Route;
-use KodePandai\ApiResponse\Exceptions\ApiException;
-use KodePandai\ApiResponse\Exceptions\ApiValidationException;
 use KodePandai\ApiResponse\Tests\TestCase;
 use function Pest\Laravel\getJson;
-
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 uses(TestCase::class);
 
 it('render an api response when exception is thrown', function () {
     //.
-    Route::get('error', fn () => throw new InvalidArgumentException('Hehehe'));
+    Route::get('error', function () {
+        throw new InvalidArgumentException('Hehehe');
+    });
 
     getJson('error')
         ->assertStatus(Response::HTTP_INTERNAL_SERVER_ERROR)
@@ -26,7 +24,9 @@ it('render an api response when exception is thrown', function () {
 it('does not display message and stack traces on production', function () {
     //.
     Route::get('error', function () {
-        App::detectEnvironment(fn () => 'production');
+        App::detectEnvironment(function () {
+            return 'production';
+        });
 
         throw new InvalidArgumentException('Hihihi');
     });
@@ -49,11 +49,21 @@ it('does not display traces when 404 not found exception is thrown', function ()
 
 it('only display traces when response status code in [400, 502, 500]', function () {
     //.
-    Route::get('400', fn () => throw new ApiException());
-    Route::get('502', fn () => throw new ApiException(502, 502));
-    Route::get('500', fn () => throw new ApiException(500, 500));
-    Route::get('404', fn () => throw new NotFoundHttpException(404));
-    Route::get('422', fn () => throw new ApiValidationException());
+    Route::get('400', function () {
+        return abort(Response::HTTP_BAD_REQUEST);
+    });
+    Route::get('502', function () {
+        return abort(Response::HTTP_BAD_GATEWAY);
+    });
+    Route::get('500', function () {
+        return abort(Response::HTTP_INTERNAL_SERVER_ERROR);
+    });
+    Route::get('404', function () {
+        return abort(Response::HTTP_NOT_FOUND);
+    });
+    Route::get('422', function () {
+        throw abort(Response::HTTP_UNPROCESSABLE_ENTITY);
+    });
 
     getJson('400')
         ->assertStatus(Response::HTTP_BAD_REQUEST)

@@ -2,6 +2,7 @@
 
 namespace KodePandai\ApiResponse;
 
+use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\App;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -11,9 +12,15 @@ class ExceptionHandler
 {
     /**
      * Render throwable as ApiResponse
+     *
+     * @return ApiResponse|Response
      */
-    public static function renderAsApiResponse(Throwable $e): ApiResponse
+    public static function renderAsApiResponse(Throwable $e)
     {
+        if ($e instanceof Renderable) {
+            return $e->render();
+        }
+
         $self = new self;
 
         $traces = $self->getTraces($e);
