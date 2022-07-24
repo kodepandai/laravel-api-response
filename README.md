@@ -130,14 +130,14 @@ you can use the `ExceptionHandler::renderAsApiResponse` helper.
 ```php
 // file: Exception/Handler.php
 
-use KodePandai\ApiResponse\ExceptionHandler;
+use KodePandai\ApiResponse\ExceptionHandler as ApiExceptionHandler;
 
 // new laravel (>= 8)
 public function register()
 {
     $this->renderable(function (Throwable $e, $request) {
         if ($request->wantsJson()) {
-            return ExceptionHandler::renderAsApiResponse($e);
+            return ApiExceptionHandler::renderAsApiResponse($e);
         }
     });
 }
@@ -146,7 +146,7 @@ public function register()
 public function render($request, Throwable $exception)
 {
     if ($request->wantsJson()) {
-        return ExceptionHandler::renderAsApiResponse($exception);
+        return ApiExceptionHandler::renderAsApiResponse($exception);
     }
 
     return parent::render($request, $exception);
