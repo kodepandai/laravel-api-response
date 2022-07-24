@@ -1,8 +1,10 @@
 <?php
 
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Route;
+use KodePandai\ApiResponse\Exceptions\ApiException;
 use KodePandai\ApiResponse\Tests\TestCase;
 use function Pest\Laravel\getJson;
 
@@ -47,6 +49,22 @@ it('does not display traces when 404 not found exception is thrown', function ()
         ->assertDontSee('_traces');
 });
 
+it('can still return json response if exception handler is not configured', function () {
+    //.
+    Route::get('eee', function () {
+        App::singleton(
+            \Illuminate\Contracts\Debug\ExceptionHandler::class,
+            \Orchestra\Testbench\Exceptions\Handler::class,
+        );
+
+        throw new ApiException('Error!');
+    });
+
+    getJson('eee')
+        ->assertStatus(Response::HTTP_BAD_REQUEST)
+        ->assertJsonPath('message', 'Error!');
+});
+
 it('only display traces when response status code in [400, 502, 500]', function () {
     //.
     Route::get('400', function () {
@@ -89,4 +107,17 @@ it('only display traces when response status code in [400, 502, 500]', function 
         ->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
         ->assertJsonStructure(['success', 'title', 'message', 'data', 'errors'])
         ->assertDontSee('_traces');
+});
+
+it('return 401 for laravel authentication exception', function () {
+    //.
+    Route::get('dashboard', function () {
+        throw new AuthenticationException('Must be authenticated.');
+    });
+
+    getJson('dashboard')
+        ->assertStatus(Response::HTTP_UNAUTHORIZED)
+        ->assertJsonStructure(['success', 'title', 'message', 'data', 'errors'])
+        ->assertDontSee('_traces')
+        ->assertJsonPath('message', 'Must be authenticated.');
 });

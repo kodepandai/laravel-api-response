@@ -2,32 +2,39 @@
 
 namespace KodePandai\ApiResponse;
 
-use Illuminate\Contracts\Support\Renderable;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\App;
+use KodePandai\ApiResponse\Exceptions\ApiException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Throwable;
 
 class ExceptionHandler
 {
     /**
-     * Render throwable as ApiResponse
+     * Render throwable as ApiResponse or throw again if fails.
      *
-     * @return ApiResponse|Response
+     * @return ApiResponse|Response|Throwable
      */
     public static function renderAsApiResponse(Throwable $e)
     {
-        if ($e instanceof Renderable) {
+        if ($e instanceof ApiException) {
             return $e->render();
         }
 
-        $self = new self;
+        try {
+            $self = new self;
 
-        $traces = $self->getTraces($e);
+            $traces = $self->getTraces($e);
 
-        return ApiResponse::error($traces ? ['_traces' => $traces] : [])
-            ->message($self->getMessage($e))
-            ->statusCode($self->getStatusCode($e));
+            return ApiResponse::error($traces ? ['_traces' => $traces] : [])
+                ->message($self->getMessage($e))
+                ->statusCode($self->getStatusCode($e));
+        } //.
+        catch (\Throwable $e) {
+            return $e;
+        }
     }
 
     /**
@@ -47,9 +54,13 @@ class ExceptionHandler
      */
     protected function getStatusCode(Throwable $e): int
     {
-        if ($e instanceof HttpException) {
+        if ($e instanceof HttpException || $e instanceof HttpExceptionInterface) {
             $statusCode = $e->getStatusCode();
-        } else {
+        } //.
+        elseif ($e instanceof AuthenticationException) {
+            $statusCode = Response::HTTP_UNAUTHORIZED;
+        } // .
+        else {
             $statusCode = Response::HTTP_INTERNAL_SERVER_ERROR;
         }
 
