@@ -2,6 +2,15 @@
 
 All notable changes to `laravel-api-response` will be documented in this file.
 
+## [v1.2.0](https://github.com/kodepandai/laravel-api-response/compare/v1.1.0...v1.2.0) - 24 Jul 2022
+
+### Fixed
+
+- Add try/catch handler when parsing exception to response
+- Return 401 `HTTP_UNAUTHORIZED` for laravel `AuthenticationException`
+- Get data directly from `ResourceCollection` data type
+- Add more tests to improve coverage
+
 ## [v1.1.0](https://github.com/kodepandai/laravel-api-response/compare/v1.0.0...v1.1.0) - 28 Jun 2022
 
 ### Fixed
