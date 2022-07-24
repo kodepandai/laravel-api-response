@@ -145,7 +145,7 @@ class ApiResponse extends Fluent implements Responsable
             $this->attributes['data'] = $data;
         //.
         } elseif ($data instanceof ResourceCollection) {
-            $this->attributes['data'] = $data->response()->getData(true);
+            $this->attributes['data'] = $data->response()->getData(true)['data'];
         //.
         } elseif ($data instanceof JsonResource) {
             $this->attributes['data'] = json_decode($data->toJson(), true);

@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Route;
 use KodePandai\ApiResponse\ApiResponse;
@@ -79,6 +81,33 @@ it('returns correct json structure for error api response', function () {
             'data' => [],
             'errors' => $errors,
         ]);
+});
+
+it('can handle data of type ResourceCollection|JsonResource|Collection', function () {
+    Route::get('r1', function () {
+        return ApiResponse::success(collect(['a' => 'b', 'c' => 'd']));
+    });
+    Route::get('r2', function () {
+        return ApiResponse::success(new JsonResource(['x' => 'y', 'z']));
+    });
+    Route::get('r3', function () {
+        return ApiResponse::success(new ResourceCollection([
+            new JsonResource(['name' => 'Mario']),
+            new JsonResource(['name' => 'Luigi']),
+        ]));
+    });
+
+    getJson('r1')
+        ->assertOk()
+        ->assertJsonPath('data', ['a' => 'b', 'c' => 'd']);
+
+    getJson('r2')
+        ->assertOk()
+        ->assertJsonPath('data', ['x' => 'y', 'z']);
+
+    getJson('r3')
+        ->assertOk()
+        ->assertJsonPath('data', [['name' => 'Mario'], ['name' => 'Luigi']]);
 });
 
 it('fails when the argument $data is not valid', function () {
