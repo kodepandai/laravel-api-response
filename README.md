@@ -136,7 +136,7 @@ use KodePandai\ApiResponse\ExceptionHandler as ApiExceptionHandler;
 public function register()
 {
     $this->renderable(function (Throwable $e, $request) {
-        if ($request->wantsJson()) {
+        if ($request->wantsJson() || str_contains($request->path(), 'api')) {
             return ApiExceptionHandler::renderAsApiResponse($e);
         }
     });
@@ -145,7 +145,7 @@ public function register()
 // old laravel (<= 7)
 public function render($request, Throwable $exception)
 {
-    if ($request->wantsJson()) {
+    if ($request->wantsJson() || str_contains($request->path(), 'api')) {
         return ApiExceptionHandler::renderAsApiResponse($exception);
     }
 
