@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Auth\AuthenticationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Route;
@@ -120,4 +121,23 @@ it('return 401 for laravel authentication exception', function () {
         ->assertJsonStructure(['success', 'title', 'message', 'data', 'errors'])
         ->assertDontSee('_traces')
         ->assertJsonPath('message', 'Must be authenticated.');
+});
+
+it('return 404 for laravel model not found exception', function () {
+    //.
+    Route::get('model/{id}', function () {
+        throw new ModelNotFoundException("No query for Model X");
+    });
+
+    getJson('model/1')
+        ->assertStatus(Response::HTTP_NOT_FOUND)
+        ->assertJsonStructure(['success', 'title', 'message', 'data', 'errors'])
+        ->assertDontSee('_traces')
+        ->assertJsonPath('message', '404 Not Found.');
+
+    getJson('model/2')
+        ->assertStatus(Response::HTTP_NOT_FOUND)
+        ->assertJsonStructure(['success', 'title', 'message', 'data', 'errors'])
+        ->assertDontSee('_traces')
+        ->assertJsonPath('message', '404 Not Found.');
 });
