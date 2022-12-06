@@ -2,6 +2,12 @@
 
 All notable changes to `laravel-api-response` will be documented in this file.
 
+## [Unreleased](https://github.com/kodepandai/laravel-api-response/compare/v1.2.0...main) - TBD
+
+### Fixed
+
+- Return 404 `NOT_FOUND` for laravel `ModelNotFoundException`
+
 ## [v1.2.0](https://github.com/kodepandai/laravel-api-response/compare/v1.1.0...v1.2.0) - 24 Jul 2022
 
 ### Fixed

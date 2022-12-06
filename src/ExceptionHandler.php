@@ -3,6 +3,7 @@
 namespace KodePandai\ApiResponse;
 
 use Illuminate\Auth\AuthenticationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\App;
 use KodePandai\ApiResponse\Exceptions\ApiException;
@@ -59,8 +60,10 @@ class ExceptionHandler
         } //.
         elseif ($e instanceof AuthenticationException) {
             $statusCode = Response::HTTP_UNAUTHORIZED;
-        } // .
-        else {
+        } //.
+        elseif ($e instanceof ModelNotFoundException) {
+            $statusCode = Response::HTTP_NOT_FOUND;
+        } else {
             $statusCode = Response::HTTP_INTERNAL_SERVER_ERROR;
         }
 
