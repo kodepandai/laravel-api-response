@@ -2,13 +2,13 @@
 
 namespace KodePandai\ApiResponse;
 
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Http\Response;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Fluent;
 use InvalidArgumentException;
@@ -62,12 +62,12 @@ class ApiResponse extends Fluent implements Responsable
     public function toResponse($request): JsonResponse
     {
         return (new JsonResponse([
-                'success' => $this->isSuccess,
-                'title' => $this->title,
-                'message' => $this->message,
-                'data' => $this->data,
-                'errors' => $this->errors,
-            ]))
+            'success' => $this->isSuccess,
+            'title' => $this->title,
+            'message' => $this->message,
+            'data' => $this->data,
+            'errors' => $this->errors,
+        ]))
             ->setStatusCode($this->statusCode)
             ->withHeaders($this->headers);
     }
@@ -83,7 +83,7 @@ class ApiResponse extends Fluent implements Responsable
     /**
      * Return a success api response.
      *
-     * @param array|Collection|JsonResource|ResourceCollection $data
+     * @param array|Arrayable|JsonResource|ResourceCollection $data
      */
     public static function success($data = []): self
     {
@@ -135,10 +135,10 @@ class ApiResponse extends Fluent implements Responsable
     }
 
     /**
-    * Add data to response and transform according to its type.
-    *
-    * @param array|Collection|JsonResource|ResourceCollection $data
-    */
+     * Add data to response and transform according to its type.
+     *
+     * @param array|Arrayable|JsonResource|ResourceCollection $data
+     */
     public function data($data): self
     {
         if (is_array($data)) {
@@ -150,7 +150,7 @@ class ApiResponse extends Fluent implements Responsable
         } elseif ($data instanceof JsonResource) {
             $this->attributes['data'] = json_decode($data->toJson(), true);
         //.
-        } elseif ($data instanceof Collection) {
+        } elseif ($data instanceof Arrayable) {
             $this->attributes['data'] = $data->toArray();
         //.
         } else {
