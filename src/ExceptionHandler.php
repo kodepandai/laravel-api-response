@@ -4,6 +4,7 @@ namespace KodePandai\ApiResponse;
 
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\App;
 use KodePandai\ApiResponse\Exceptions\ApiException;
@@ -18,8 +19,10 @@ class ExceptionHandler
      *
      * @return ApiResponse|Response|Throwable
      */
-    public static function renderAsApiResponse(Throwable $e)
+    public static function renderAsApiResponse(Throwable $e, Request $request = null)
     {
+        $request = $request ?? request();
+
         if ($e instanceof ApiException) {
             return $e->render();
         }
@@ -31,7 +34,8 @@ class ExceptionHandler
 
             return ApiResponse::error($traces ? ['_traces' => $traces] : [])
                 ->message($self->getMessage($e))
-                ->statusCode($self->getStatusCode($e));
+                ->statusCode($self->getStatusCode($e))
+                ->toResponse($request);
         } //.
         catch (\Throwable $e) {
             return $e;

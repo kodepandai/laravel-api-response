@@ -13,7 +13,7 @@ By default, the stucture of the API response looks like this:
   "data": [
     // users...
   ],
-  "errors": [],
+  "errors": []
 }
 ```
 
@@ -62,7 +62,7 @@ ApiResponse::error()
 
 ApiResponse::error(['email' => ['The email field is required.']])
            ->statusCode(Response::HTTP_UNPROCESSABLE_ENTITY);
-           
+
 ApiResponse::error()
            ->statusCode(Response::HTTP_SERVICE_UNAVAILABLE)
            ->message('Out of service, please comeback later.');
@@ -70,11 +70,11 @@ ApiResponse::error()
 
 ### Validate or Fail
 
-Use this helper to validate user submitted request, then return 
-an `ApiResponse::error` response if the validation fails. 
+Use this helper to validate user submitted request, then return
+an `ApiResponse::error` response if the validation fails.
 
-With this helper, now you can use something like `$request->validate()` 
-without worrying on how to handle the redirect response or validation errors 
+With this helper, now you can use something like `$request->validate()`
+without worrying on how to handle the redirect response or validation errors
 separately.
 
 ```php
@@ -104,13 +104,13 @@ $validatedData = ApiResponse::validateOrFail([
 
 ### Throwing an Exception
 
-Instead of using `ApiResponse` manually, you can also throw an exception 
+Instead of using `ApiResponse` manually, you can also throw an exception
 and will get the same response according to the exception type.
 
 This package provides two exception: `ApiException` and `ApiValidationException`.
 
-* `ApiException`: throw an api error
-* `ApiValidationException`: throw a validation error
+- `ApiException`: throw an api error
+- `ApiValidationException`: throw a validation error
 
 ```php
 if (! DB::hasDriver('mysql')) {
@@ -153,6 +153,40 @@ public function render($request, Throwable $exception)
 }
 ```
 
+### Handling Exception Manually
+
+If you want to handle all exceptions manually, please not that you must convert `ApiResponse` to `JsonResponse` by call
+`toResponse` method explicitly. See this example:
+
+```php
+// file: Exception/Handler.php
+
+// new laravel (>= 8)
+public function register()
+{
+    $this->renderable(function (AuthenticationException $e, Request $request) {
+        return ApiResponse::error()
+            ->message('Unauthorized')
+            ->statusCode(401)
+            ->toResponse($request); // this part is required
+    });
+}
+
+// old laravel (<= 7)
+public function render($request, Throwable $exception)
+{
+    if($exception instanceof AuthenticationException){
+        return ApiResponse::error()
+            ->message('Unauthorized')
+            ->statusCode(401)
+            ->toResponse($request); // this part is required
+    }
+
+    return parent::render($request, $exception);
+}
+
+```
+
 ## Develop
 
-* To test run `composer test`.
+- To test run `composer test`.
