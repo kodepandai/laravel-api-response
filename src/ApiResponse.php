@@ -62,12 +62,12 @@ class ApiResponse extends Fluent implements Responsable
     public function toResponse($request): JsonResponse
     {
         return (new JsonResponse([
-            'success' => $this->isSuccess,
-            'title' => $this->title,
-            'message' => $this->message,
-            'data' => $this->data,
-            'errors' => $this->errors,
-        ]))
+                'success' => $this->isSuccess,
+                'title' => $this->title,
+                'message' => $this->message,
+                'data' => $this->data,
+                'errors' => $this->errors,
+            ]))
             ->setStatusCode($this->statusCode)
             ->withHeaders($this->headers);
     }
@@ -83,7 +83,7 @@ class ApiResponse extends Fluent implements Responsable
     /**
      * Return a success api response.
      *
-     * @param array|Arrayable|JsonResource|ResourceCollection $data
+     * @param array|Arrayable|Collection|JsonResource|ResourceCollection $data
      */
     public static function success($data = []): self
     {
@@ -137,7 +137,7 @@ class ApiResponse extends Fluent implements Responsable
     /**
      * Add data to response and transform according to its type.
      *
-     * @param array|Arrayable|JsonResource|ResourceCollection $data
+     * @param array|Arrayable|Collection|JsonResource|ResourceCollection $data
      */
     public function data($data): self
     {

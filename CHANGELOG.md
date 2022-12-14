@@ -2,11 +2,18 @@
 
 All notable changes to `laravel-api-response` will be documented in this file.
 
-## [Unreleased](https://github.com/kodepandai/laravel-api-response/compare/v1.2.0...main) - TBD
+## [Unreleased](https://github.com/kodepandai/laravel-api-response/compare/v1.3.0...main) - TBD
+
+## [v1.3.0](https://github.com/kodepandai/laravel-api-response/compare/v1.2.0...v1.3.0) - 14 Dec 2022
 
 ### Fixed
 
-- Return 404 `NOT_FOUND` for laravel `ModelNotFoundException`
+- Laravel exception handler does not recognize Responsable trait ([#11](https://github.com/kodepandai/laravel-api-response/pull/11))
+- Return 404 `NOT_FOUND` for laravel `ModelNotFoundException` ([#10](https://github.com/kodepandai/laravel-api-response/pull/10))
+
+### Added
+
+- Support `Arrayable` interface for response data ([#13](https://github.com/kodepandai/laravel-api-response/pull/13))
 
 ## [v1.2.0](https://github.com/kodepandai/laravel-api-response/compare/v1.1.0...v1.2.0) - 24 Jul 2022
 

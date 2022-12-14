@@ -136,7 +136,7 @@ use KodePandai\ApiResponse\ExceptionHandler as ApiExceptionHandler;
 public function register()
 {
     $this->renderable(function (Throwable $e, $request) {
-        if ($request->wantsJson() || str_contains($request->path(), 'api')) {
+        if ($request->wantsJson() || $request->is('*api*')) {
             return ApiExceptionHandler::renderAsApiResponse($e);
         }
     });
@@ -145,7 +145,7 @@ public function register()
 // old laravel (<= 7)
 public function render($request, Throwable $exception)
 {
-    if ($request->wantsJson() || str_contains($request->path(), 'api')) {
+    if ($request->wantsJson() || $request->is('*api*')) {
         return ApiExceptionHandler::renderAsApiResponse($exception);
     }
 
@@ -155,8 +155,9 @@ public function render($request, Throwable $exception)
 
 ### Handling Exception Manually
 
-If you want to handle all exceptions manually, please not that you must convert `ApiResponse` to `JsonResponse` by call
-`toResponse` method explicitly. See this example:
+If you want to handle exception manually, 
+please note that you must convert `ApiResponse` to `JsonResponse`
+by calling `toResponse` method explicitly. See this example:
 
 ```php
 // file: Exception/Handler.php
@@ -167,7 +168,7 @@ public function register()
     $this->renderable(function (AuthenticationException $e, Request $request) {
         return ApiResponse::error()
             ->message('Unauthorized')
-            ->statusCode(401)
+            ->statusCode(Response::HTTP_UNAUTHORIZED)
             ->toResponse($request); // this part is required
     });
 }
@@ -178,7 +179,7 @@ public function render($request, Throwable $exception)
     if($exception instanceof AuthenticationException){
         return ApiResponse::error()
             ->message('Unauthorized')
-            ->statusCode(401)
+            ->statusCode(Response::HTTP_UNAUTHORIZED)
             ->toResponse($request); // this part is required
     }
 
