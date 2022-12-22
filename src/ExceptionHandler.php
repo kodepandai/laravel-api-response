@@ -24,7 +24,7 @@ class ExceptionHandler
         $request = $request ?? request();
 
         if ($e instanceof ApiException) {
-            return $e->render();
+            return $e->render($request);
         }
 
         try {

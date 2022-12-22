@@ -4,6 +4,8 @@ namespace KodePandai\ApiResponse\Exceptions;
 
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use KodePandai\ApiResponse\ApiResponse;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -35,26 +37,29 @@ class ApiException extends HttpException implements Responsable, Renderable
     /**
      * Convert exception to json response.
      */
-    public function toResponse($request): ApiResponse
+    public function toResponse($request): JsonResponse
     {
-        return $this->getResponse();
+        return $this->getResponse($request);
     }
 
     /**
      * Render exception as json response.
      */
-    public function render(): ApiResponse
+    public function render(Request $request = null): JsonResponse
     {
-        return $this->getResponse();
+        return $this->getResponse($request);
     }
 
     /**
      * Get the response.
      */
-    public function getResponse(): ApiResponse
+    public function getResponse(Request $request = null): JsonResponse
     {
+        $request = $request ?? request();
+
         return ApiResponse::error()
             ->message($this->getMessage())
-            ->statusCode($this->getStatusCode());
+            ->statusCode($this->getStatusCode())
+            ->toResponse($request);
     }
 }

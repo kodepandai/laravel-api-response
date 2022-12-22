@@ -2,6 +2,8 @@
 
 namespace KodePandai\ApiResponse\Exceptions;
 
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use KodePandai\ApiResponse\ApiResponse;
 
@@ -24,11 +26,14 @@ class ApiValidationException extends ApiException
     /**
      * Get the response.
      */
-    public function getResponse(): ApiResponse
+    public function getResponse(Request $request = null): JsonResponse
     {
+        $request = $request ?? request();
+
         return ApiResponse::error($this->errors)
-        ->title('Validation Error')
-        ->message($this->getMessage())
-        ->statusCode($this->getStatusCode());
+            ->title('Validation Error')
+            ->message($this->getMessage())
+            ->statusCode($this->getStatusCode())
+            ->toResponse($request);
     }
 }
