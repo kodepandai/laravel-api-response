@@ -10,6 +10,6 @@ class ExceptionHandler extends Handler
 {
     public function render($request, Throwable $e)
     {
-        return ApiExceptionHandler::renderAsApiResponse($e);
+        return ApiExceptionHandler::renderAsApiResponse($e, $request);
     }
 }
