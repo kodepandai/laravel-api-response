@@ -137,7 +137,7 @@ public function register()
 {
     $this->renderable(function (Throwable $e, $request) {
         if ($request->wantsJson() || $request->is('*api*')) {
-            return ApiExceptionHandler::renderAsApiResponse($e);
+            return ApiExceptionHandler::renderAsApiResponse($e, $request);
         }
     });
 }
@@ -146,7 +146,7 @@ public function register()
 public function render($request, Throwable $exception)
 {
     if ($request->wantsJson() || $request->is('*api*')) {
-        return ApiExceptionHandler::renderAsApiResponse($exception);
+        return ApiExceptionHandler::renderAsApiResponse($exception, $request);
     }
 
     return parent::render($request, $exception);
