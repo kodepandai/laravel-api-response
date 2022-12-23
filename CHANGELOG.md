@@ -2,7 +2,13 @@
 
 All notable changes to `laravel-api-response` will be documented in this file.
 
-## [Unreleased](https://github.com/kodepandai/laravel-api-response/compare/v1.3.0...main) - TBD
+## [Unreleased](https://github.com/kodepandai/laravel-api-response/compare/v1.3.1...main) - TBD
+
+## [v1.3.1](https://github.com/kodepandai/laravel-api-response/compare/v1.3.0...v1.3.1) - 23 Dec 2022
+
+### Fixed
+
+- Exception Handler fails to convert ApiResponse to JsonResponse ([#16](https://github.com/kodepandai/laravel-api-response/pull/16))
 
 ## [v1.3.0](https://github.com/kodepandai/laravel-api-response/compare/v1.2.0...v1.3.0) - 14 Dec 2022
 
