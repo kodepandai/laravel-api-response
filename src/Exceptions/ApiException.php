@@ -22,7 +22,7 @@ class ApiException extends Exception implements Responsable
         };
 
         if (! empty($title)) {
-            $this->response->message($title);
+            $this->response->title($title);
         }
 
         if (! empty($message)) {

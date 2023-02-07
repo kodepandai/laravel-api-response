@@ -21,10 +21,6 @@ jobs:
             php: 8.0
             testbench: ^7.0
             stability: prefer-stable
-          - laravel: 8.*
-            php: 8.0
-            testbench: ^6.0
-            stability: prefer-stable
             #
     name: Laravel ${{ matrix.laravel }} with PHP ${{ matrix.php }} - ${{ matrix.stability }}
     steps:
