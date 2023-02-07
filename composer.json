@@ -10,12 +10,11 @@
   "homepage": "https://github.com/kodepandai/laravel-api-response",
   "license": "MIT",
   "require": {
-    "php": "^7.3|^8.0",
-    "laravel/framework": "^7.0|^8.0|^9.0"
+    "php": "^8.0",
+    "laravel/framework": "^9.0"
   },
   "require-dev": {
-    "friendsofphp/php-cs-fixer": "^3.0",
-    "orchestra/testbench": "^5.0|^6.0|^7.0",
+    "orchestra/testbench": "^7.0",
     "pestphp/pest": "^1.2",
     "pestphp/pest-plugin-laravel": "^1.2"
   },
@@ -30,7 +29,7 @@
     }
   },
   "scripts": {
-    "lint": "php-cs-fixer fix --allow-risky=yes",
+    "lint": "pint",
     "pest": "pest --stop-on-failure",
     "test": [
       "@lint",

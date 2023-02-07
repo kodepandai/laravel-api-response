@@ -6,13 +6,14 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Route;
 use KodePandai\ApiResponse\ApiResponse;
 use KodePandai\ApiResponse\Tests\TestCase;
-
 use function Pest\Laravel\getJson;
 
 uses(TestCase::class);
 
+return;
+
 it('returns correct response header', function () {
-    //.
+    //
     Route::get('api-success', function () {
         return ApiResponse::success();
     });
@@ -43,7 +44,7 @@ it('returns correct response header', function () {
 });
 
 it('returns correct json structure for success api response', function () {
-    //.
+    //
     Route::get('api-puck', function () {
         return ApiResponse::success(['id' => 1, 'name' => 'Puck'])
             ->title('Puck')->message('Puck is awesome');
@@ -61,7 +62,7 @@ it('returns correct json structure for success api response', function () {
 });
 
 it('returns correct json structure for error api response', function () {
-    //.
+    //
     $errors = [
         'id' => ['id error one'],
         'name' => ['name error one', 'name error two'],

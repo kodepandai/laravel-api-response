@@ -2,59 +2,109 @@
 
 namespace KodePandai\ApiResponse\Exceptions;
 
-use Illuminate\Contracts\Support\Renderable;
+use Exception;
 use Illuminate\Contracts\Support\Responsable;
-use Illuminate\Http\Response;
 use KodePandai\ApiResponse\ApiResponse;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 
-class ApiException extends HttpException implements Responsable, Renderable
+class ApiException extends Exception implements Responsable
 {
-    public $title = '';
+    protected ApiResponse $response;
 
-    public $errors = [];
+    public function __construct(string $message = '', string $title = '', int $statusCode = 500)
+    {
+        $this->response = match ($statusCode) {
+            ApiResponse::HTTP_NOT_FOUND => ApiResponse::notFound(),
+            ApiResponse::HTTP_UNPROCESSABLE_ENTITY => ApiResponse::unprocessable(),
+            ApiResponse::HTTP_UNAUTHORIZED => ApiResponse::unauthorized(),
+            ApiResponse::HTTP_BAD_REQUEST => ApiResponse::badRequest(),
+            ApiResponse::HTTP_FORBIDDEN => ApiResponse::forbidden(),
+            default /* HTTP_INTERNAL_SERVER_ERROR */ => ApiResponse::error(),
+        };
 
-    /**
-     * Throw an error api exception.
-     *
-     * @param string $message    The message
-     * @param int    $statusCode The HTTP status code
-     * @param array  $errors     The errors
-     */
-    public function __construct(
-        string $message = 'There is an error.',
-        int $statusCode = Response::HTTP_BAD_REQUEST,
-        array $errors = []
-    ) {
-        $this->message = $message;
-        $this->errors = $errors;
+        if (! empty($title)) {
+            $this->response->message($title);
+        }
 
-        parent::__construct($statusCode, $message);
+        if (! empty($message)) {
+            $this->response->message($message);
+        }
     }
 
-    /**
-     * Convert exception to json response.
-     */
-    public function toResponse($request): ApiResponse
+    public function toResponse($request)
     {
-        return $this->getResponse();
+        return $this->response;
     }
 
-    /**
-     * Render exception as json response.
-     */
-    public function render(): ApiResponse
+    protected function setResponse(ApiResponse $response): static
     {
-        return $this->getResponse();
+        $this->response = $response;
+
+        return $this;
     }
 
-    /**
-     * Get the response.
-     */
-    public function getResponse(): ApiResponse
+    protected function title(string $title): static
     {
-        return ApiResponse::error()
-            ->message($this->getMessage())
-            ->statusCode($this->getStatusCode());
+        $this->response->title($title);
+
+        return $this;
+    }
+
+    protected function withTitle(string $title): static
+    {
+        return $this->title($title);
+    }
+
+    protected function errors(mixed $errors = []): static
+    {
+        $this->response->errors($errors);
+
+        return $this;
+    }
+
+    protected function withErrors(mixed $errors = []): static
+    {
+        return $this->errors($errors);
+    }
+
+    protected function statusCode(int $statusCode): static
+    {
+        $this->response->setStatusCode($statusCode);
+
+        return $this;
+    }
+
+    protected function withStatusCode(int $statusCode): static
+    {
+        return $this->statusCode($statusCode);
+    }
+
+    public static function error(string $message = '', string $title = '', int $statusCode = 500): static
+    {
+        return new static($message, $title, $statusCode);
+    }
+
+    public static function notFound(string $message = '', string $title = ''): static
+    {
+        return new static($message, $title, ApiResponse::HTTP_NOT_FOUND);
+    }
+
+    public static function unprocessable(string $message = '', string $title = ''): static
+    {
+        return new static($message, $title, ApiResponse::HTTP_UNPROCESSABLE_ENTITY);
+    }
+
+    public static function unauthorized(string $message = '', string $title = ''): static
+    {
+        return new static($message, $title, ApiResponse::HTTP_UNAUTHORIZED);
+    }
+
+    public static function forbidden(string $message = '', string $title = ''): static
+    {
+        return new static($message, $title, ApiResponse::HTTP_FORBIDDEN);
+    }
+
+    public static function badRequest(string $message = '', string $title = ''): static
+    {
+        return new static($message, $title, ApiResponse::HTTP_BAD_REQUEST);
     }
 }

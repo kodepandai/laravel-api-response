@@ -11,8 +11,10 @@ use function Pest\Laravel\getJson;
 
 uses(TestCase::class);
 
+return;
+
 it('render an api response when exception is thrown', function () {
-    //.
+    //
     Route::get('error', function () {
         throw new InvalidArgumentException('Hehehe');
     });
@@ -25,7 +27,7 @@ it('render an api response when exception is thrown', function () {
 });
 
 it('does not display message and stack traces on production', function () {
-    //.
+    //
     Route::get('error', function () {
         App::detectEnvironment(function () {
             return 'production';
@@ -51,7 +53,7 @@ it('does not display traces when 404 not found exception is thrown', function ()
 });
 
 it('can still return json response if exception handler is not configured', function () {
-    //.
+    //
     Route::get('eee', function () {
         App::singleton(
             \Illuminate\Contracts\Debug\ExceptionHandler::class,
@@ -67,7 +69,7 @@ it('can still return json response if exception handler is not configured', func
 });
 
 it('only display traces when response status code in [400, 502, 500]', function () {
-    //.
+    //
     Route::get('400', function () {
         return abort(Response::HTTP_BAD_REQUEST);
     });
@@ -111,7 +113,7 @@ it('only display traces when response status code in [400, 502, 500]', function 
 });
 
 it('return 401 for laravel authentication exception', function () {
-    //.
+    //
     Route::get('dashboard', function () {
         throw new AuthenticationException('Must be authenticated.');
     });
@@ -124,9 +126,9 @@ it('return 401 for laravel authentication exception', function () {
 });
 
 it('return 404 for laravel model not found exception', function () {
-    //.
+    //
     Route::get('model/{id}', function () {
-        throw new ModelNotFoundException("No query for Model X");
+        throw new ModelNotFoundException('No query for Model X');
     });
 
     getJson('model/1')

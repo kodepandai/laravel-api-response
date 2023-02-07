@@ -1,0 +1,17 @@
+{
+    "Error": "Error",
+    "Success": "Success",
+    "Successful": "Successful",
+    "Not Found": "Not Found",
+    "Validation Error": "Validation Error",
+    "Unauthorized": "Unauthorized",
+    "Forbidden": "Forbidden",
+    "Bad Request": "Bad Request",
+    "Oops! Something went wrong.": "Oops! Something went wrong.",
+    "Resource not found.": "Resource not found.",
+    "The given data was invalid.": "The given data was invalid.",
+    "Your request is unauthorized.": "Your request is unauthorized.",
+    "Your request is forbidden.": "Your request is forbidden.",
+    "Your request is bad request.": "Your request is bad request.",
+    ":key is invalid.": ":key is invalid."
+}

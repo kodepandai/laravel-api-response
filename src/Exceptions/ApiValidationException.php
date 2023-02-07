@@ -2,33 +2,29 @@
 
 namespace KodePandai\ApiResponse\Exceptions;
 
-use Illuminate\Http\Response;
+use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Validation\ValidationException;
 use KodePandai\ApiResponse\ApiResponse;
 
-class ApiValidationException extends ApiException
+class ApiValidationException extends ValidationException implements Responsable
 {
-    /**
-     * Throw a validation error api exception.
-     *
-     * @param array $errors The errors
-     */
-    public function __construct(array $errors = [])
+    public function __construct($validator)
     {
-        parent::__construct(
-            'The given data was invalid.',
-            Response::HTTP_UNPROCESSABLE_ENTITY,
-            $errors
-        );
+        $response = ApiResponse::unprocessable()
+            ->errors($validator->errors()->toArray());
+
+        parent::__construct($validator, $response);
     }
 
-    /**
-     * Get the response.
-     */
-    public function getResponse(): ApiResponse
+    public function toResponse($request)
     {
-        return ApiResponse::error($this->errors)
-        ->title('Validation Error')
-        ->message($this->getMessage())
-        ->statusCode($this->getStatusCode());
+        return $this->getResponse();
+    }
+
+    public static function invalid(string $key, string $message = null): static
+    {
+        $message = $message ?: __(':key is invalid.', ['key' => $key]);
+
+        return static::withMessages([$key => [$message]]);
     }
 }
