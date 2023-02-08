@@ -16,8 +16,8 @@ class ApiException extends Exception implements Responsable
             ApiResponse::HTTP_NOT_FOUND => ApiResponse::notFound(),
             ApiResponse::HTTP_UNPROCESSABLE_ENTITY => ApiResponse::unprocessable(),
             ApiResponse::HTTP_UNAUTHORIZED => ApiResponse::unauthorized(),
-            ApiResponse::HTTP_BAD_REQUEST => ApiResponse::badRequest(),
             ApiResponse::HTTP_FORBIDDEN => ApiResponse::forbidden(),
+            ApiResponse::HTTP_BAD_REQUEST => ApiResponse::badRequest(),
             default /* HTTP_INTERNAL_SERVER_ERROR */ => ApiResponse::error(),
         };
 
@@ -35,45 +35,50 @@ class ApiException extends Exception implements Responsable
         return $this->response;
     }
 
-    protected function setResponse(ApiResponse $response): static
-    {
-        $this->response = $response;
-
-        return $this;
-    }
-
-    protected function title(string $title): static
+    public function title(string $title): static
     {
         $this->response->title($title);
 
         return $this;
     }
 
-    protected function withTitle(string $title): static
+    public function withTitle(string $title): static
     {
         return $this->title($title);
     }
 
-    protected function errors(mixed $errors = []): static
+    public function message(string $message): static
+    {
+        $this->response->message($message);
+
+        return $this;
+    }
+
+    public function withMessage(string $title): static
+    {
+        return $this->message($title);
+    }
+
+    public function errors(mixed $errors = []): static
     {
         $this->response->errors($errors);
 
         return $this;
     }
 
-    protected function withErrors(mixed $errors = []): static
+    public function withErrors(mixed $errors = []): static
     {
         return $this->errors($errors);
     }
 
-    protected function statusCode(int $statusCode): static
+    public function statusCode(int $statusCode): static
     {
         $this->response->setStatusCode($statusCode);
 
         return $this;
     }
 
-    protected function withStatusCode(int $statusCode): static
+    public function withStatusCode(int $statusCode): static
     {
         return $this->statusCode($statusCode);
     }

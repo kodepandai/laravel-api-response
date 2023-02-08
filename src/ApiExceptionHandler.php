@@ -30,7 +30,7 @@ class ApiExceptionHandler
      */
     public static function render(Throwable $e, Request $request = null)
     {
-        $request ?: request();
+        $request = $request ?: app(Request::class);
 
         if ($e instanceof ApiException || $e instanceof ApiValidationException) {
             return $e->toResponse($request);
@@ -63,8 +63,6 @@ class ApiExceptionHandler
         } catch (\Throwable $e) {
             //
             $handler = app(ExceptionHandler::class);
-
-            dd($e);
 
             $method = new ReflectionMethod($handler, 'renderExceptionResponse');
 
