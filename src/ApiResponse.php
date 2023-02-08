@@ -8,6 +8,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
+use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Support\Facades\Validator;
 use InvalidArgumentException;
 use KodePandai\ApiResponse\Exceptions\ApiValidationException;
@@ -207,14 +208,20 @@ class ApiResponse extends JsonResponse
     {
         if (is_array($data)) {
             $data = $data;
+            //
         } elseif ($data instanceof ArrayObject) {
             $data = (array) $data;
+            //
         } elseif ($data instanceof ResourceCollection) {
-            $data = $data->response()->getData(true)['data'];
+            $data = ($data->resource instanceof AbstractPaginator)
+                ? $data->response()->getData() : json_decode($data->toJson());
+            //
         } elseif ($data instanceof JsonResource || method_exists($data, 'toJson')) {
             $data = json_decode($data->toJson(), true);
+            //
         } elseif ($data instanceof Arrayable || method_exists($data, 'toArray')) {
             $data = $data->toArray();
+            //
         } else {
             throw new InvalidArgumentException('Unsupported $data type for API Response');
         }

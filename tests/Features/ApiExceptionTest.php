@@ -1,10 +1,8 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Route;
-use KodePandai\ApiResponse\ApiResponse;
 use KodePandai\ApiResponse\Exceptions\ApiException;
 use KodePandai\ApiResponse\Exceptions\ApiValidationException;
 use KodePandai\ApiResponse\Tests\TestCase;
@@ -18,13 +16,13 @@ test('ApiException: exception should return an ApiResponse', function () {
     Route::get('api-server-error', fn () => throw ApiException::error());
 
     Route::get('api-not-found', fn () => throw ApiException::notFound());
-    
+
     Route::get('api-unprocessable', fn () => throw ApiException::unprocessable());
-    
+
     Route::get('api-unauthorized', fn () => throw ApiException::unauthorized());
-    
+
     Route::get('api-forbidden', fn () => throw ApiException::forbidden());
-    
+
     Route::get('api-bad-request', fn () => throw ApiException::badRequest());
 
     getJson('api-server-error')
@@ -63,33 +61,33 @@ test('ApiException: exception should return an ApiResponse', function () {
         ->assertJsonPath('message', 'Your request is bad request.');
 });
 
-test('ApiException: can set custom title, message, statusCode and errors', function() {
+test('ApiException: can set custom title, message, statusCode and errors', function () {
     //
-    Route::get('custom-one', function() {
+    Route::get('custom-one', function () {
         throw ApiException::error('An ouch occured.', 'Ouch');
     });
 
-    Route::get('custom-two', function() {
+    Route::get('custom-two', function () {
         throw ApiException::error()->title('the title')->message('the message');
     });
 
-    Route::get('custom-three', function() {
+    Route::get('custom-three', function () {
         throw ApiException::error()->withTitle('the next title')->withMessage('the next message');
     });
 
-    Route::get('custom-four', function() { 
+    Route::get('custom-four', function () {
         throw ApiException::error()->statusCode(Response::HTTP_CONFLICT);
     });
 
-    Route::get('custom-five', function() { 
+    Route::get('custom-five', function () {
         throw ApiException::error()->withStatusCode(Response::HTTP_BAD_GATEWAY);
     });
 
-    Route::get('custom-six', function() { 
+    Route::get('custom-six', function () {
         throw ApiException::error()->errors(['a' => 'b', 'c' => 'd']);
     });
 
-    Route::get('custom-seven', function() { 
+    Route::get('custom-seven', function () {
         throw ApiException::error()->withErrors(['x' => 1, 'y' => 2]);
     });
 
@@ -117,12 +115,12 @@ test('ApiException: can set custom title, message, statusCode and errors', funct
     getJson('custom-five')
         ->assertStatus(Response::HTTP_BAD_GATEWAY);
 
-    getJson('custom-six')   
+    getJson('custom-six')
         ->assertServerError()
         ->assertJsonPath('errors.a', 'b')
         ->assertJsonPath('errors.c', 'd');
 
-    getJson('custom-seven')   
+    getJson('custom-seven')
         ->assertServerError()
         ->assertJsonPath('errors.x', 1)
         ->assertJsonPath('errors.y', 2);
@@ -131,23 +129,23 @@ test('ApiException: can set custom title, message, statusCode and errors', funct
 
 test('ApiValidationException: exception should return an ApiResponse', function () {
     //
-    Route::get('invalid-one', fn() => throw ApiValidationException::invalid('one'));
+    Route::get('invalid-one', fn () => throw ApiValidationException::invalid('one'));
 
-    Route::get('invalid-two', fn() => throw ApiValidationException::invalid('two', 'Two not good.'));
-    
-    Route::get('invalid-three', fn() => throw ApiValidationException::invalids([
+    Route::get('invalid-two', fn () => throw ApiValidationException::invalid('two', 'Two not good.'));
+
+    Route::get('invalid-three', fn () => throw ApiValidationException::invalids([
         'count' => PHP_INT_MAX,
-        'lorem' => 'ipsum dolor sit ament', 
+        'lorem' => 'ipsum dolor sit ament',
     ]));
-    
-    Route::get('invalid-four', fn() => throw ApiValidationException::withErrors([
+
+    Route::get('invalid-four', fn () => throw ApiValidationException::withErrors([
         'taylor' => 'the creator',
-        'laravel' => 'the framework', 
+        'laravel' => 'the framework',
         'forge' => ['the server', 'the hosting'],
     ]));
-    
-    Route::post('invalid-five', fn() => throw ApiValidationException::withMessages([
-        'message-one' => [1, 2, 3, 4, 5], 
+
+    Route::post('invalid-five', fn () => throw ApiValidationException::withMessages([
+        'message-one' => [1, 2, 3, 4, 5],
         'message-two' => [6, 7, 8, 9, 0],
     ]));
 
