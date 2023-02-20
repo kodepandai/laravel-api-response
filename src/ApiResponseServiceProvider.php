@@ -17,6 +17,8 @@ class ApiResponseServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        $this->app->bind('api-response', config('laravel-api-response.response-class'));
+
         $this->loadJsonTranslationsFrom(__DIR__.'/../lang');
 
         if (App::runningInConsole()) {

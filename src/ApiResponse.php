@@ -44,9 +44,7 @@ class ApiResponse extends JsonResponse
 
         $validator = Validator::make($request->all(), $rules, $messages, $customAttributes);
 
-        if ($validator->fails()) {
-            throw new ApiValidationException($validator);
-        }
+        throw_if($validator->fals(), new ApiValidationException($validator));
 
         return $validator->validated();
     }
@@ -214,7 +212,8 @@ class ApiResponse extends JsonResponse
             //
         } elseif ($data instanceof ResourceCollection) {
             $data = ($data->resource instanceof AbstractPaginator)
-                ? $data->response()->getData() : json_decode($data->toJson());
+                ? $data->response()->getData(true)
+                : json_decode($data->toJson(), true);
             //
         } elseif ($data instanceof JsonResource || method_exists($data, 'toJson')) {
             $data = json_decode($data->toJson(), true);

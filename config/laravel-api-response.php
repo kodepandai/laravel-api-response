@@ -7,7 +7,7 @@ return [
      * If you want to override the default response class, change here.
      * TODO: make me work!
      */
-    // 'api-response-class' => \KodePandai\ApiResponse\ApiResponse::class,
+    'response-class' => \KodePandai\ApiResponse\ApiResponse::class,
 
     /**
      * Default error status code, this will be applied in:
