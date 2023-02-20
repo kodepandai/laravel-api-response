@@ -44,7 +44,7 @@ class ApiResponse extends JsonResponse
 
         $validator = Validator::make($request->all(), $rules, $messages, $customAttributes);
 
-        throw_if($validator->fals(), new ApiValidationException($validator));
+        throw_if($validator->fails(), new ApiValidationException($validator));
 
         return $validator->validated();
     }
