@@ -4,21 +4,28 @@ namespace KodePandai\ApiResponse\Exceptions;
 
 use Exception;
 use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Http\Response;
 use KodePandai\ApiResponse\ApiResponse;
 
 class ApiException extends Exception implements Responsable
 {
     protected ApiResponse $response;
 
-    public function __construct(string $message = '', string $title = '', int $statusCode = 500)
+    public function __construct(string $message = '', string $title = '', ?int $statusCode = null)
     {
-        $this->response = match ($statusCode) {
-            ApiResponse::HTTP_NOT_FOUND => ApiResponse::notFound(),
-            ApiResponse::HTTP_UNPROCESSABLE_ENTITY => ApiResponse::unprocessable(),
-            ApiResponse::HTTP_UNAUTHORIZED => ApiResponse::unauthorized(),
-            ApiResponse::HTTP_FORBIDDEN => ApiResponse::forbidden(),
-            ApiResponse::HTTP_BAD_REQUEST => ApiResponse::badRequest(),
-            default /* HTTP_INTERNAL_SERVER_ERROR */ => ApiResponse::error(),
+        $defaultCode = config('api-response.error_code', 500);
+
+        /** @var ApiResponse $response */
+        $response = app('api-response');
+
+        $this->response = match ($statusCode ?: $defaultCode) {
+            $defaultCode => $response->error(),
+            Response::HTTP_NOT_FOUND => $response->notFound(),
+            Response::HTTP_UNPROCESSABLE_ENTITY => $response->unprocessable(),
+            Response::HTTP_UNAUTHORIZED => $response->unauthorized(),
+            Response::HTTP_FORBIDDEN => $response->forbidden(),
+            Response::HTTP_BAD_REQUEST => $response->badRequest(),
+            default => /** OTHERS **/ $response->error(),
         };
 
         if (! empty($title)) {
@@ -42,21 +49,11 @@ class ApiException extends Exception implements Responsable
         return $this;
     }
 
-    public function withTitle(string $title): static
-    {
-        return $this->title($title);
-    }
-
     public function message(string $message): static
     {
         $this->response->message($message);
 
         return $this;
-    }
-
-    public function withMessage(string $title): static
-    {
-        return $this->message($title);
     }
 
     public function errors(mixed $errors = []): static
@@ -66,50 +63,40 @@ class ApiException extends Exception implements Responsable
         return $this;
     }
 
-    public function withErrors(mixed $errors = []): static
-    {
-        return $this->errors($errors);
-    }
-
     public function statusCode(int $statusCode): static
     {
-        $this->response->setStatusCode($statusCode);
+        $this->response->statusCode($statusCode);
 
         return $this;
     }
 
-    public function withStatusCode(int $statusCode): static
+    public static function error(string $message = '', string $title = '', ?int $statusCode = null): self
     {
-        return $this->statusCode($statusCode);
+        return new self($message, $title, $statusCode ?: config('api-response.error_code'));
     }
 
-    public static function error(string $message = '', string $title = '', int $statusCode = 500): static
+    public static function notFound(string $message = '', string $title = ''): self
     {
-        return new static($message, $title, $statusCode);
+        return new self($message, $title, Response::HTTP_NOT_FOUND);
     }
 
-    public static function notFound(string $message = '', string $title = ''): static
+    public static function unprocessable(string $message = '', string $title = ''): self
     {
-        return new static($message, $title, ApiResponse::HTTP_NOT_FOUND);
+        return new self($message, $title, Response::HTTP_UNPROCESSABLE_ENTITY);
     }
 
-    public static function unprocessable(string $message = '', string $title = ''): static
+    public static function unauthorized(string $message = '', string $title = ''): self
     {
-        return new static($message, $title, ApiResponse::HTTP_UNPROCESSABLE_ENTITY);
+        return new self($message, $title, Response::HTTP_UNAUTHORIZED);
     }
 
-    public static function unauthorized(string $message = '', string $title = ''): static
+    public static function forbidden(string $message = '', string $title = ''): self
     {
-        return new static($message, $title, ApiResponse::HTTP_UNAUTHORIZED);
+        return new self($message, $title, Response::HTTP_FORBIDDEN);
     }
 
-    public static function forbidden(string $message = '', string $title = ''): static
+    public static function badRequest(string $message = '', string $title = ''): self
     {
-        return new static($message, $title, ApiResponse::HTTP_FORBIDDEN);
-    }
-
-    public static function badRequest(string $message = '', string $title = ''): static
-    {
-        return new static($message, $title, ApiResponse::HTTP_BAD_REQUEST);
+        return new self($message, $title, Response::HTTP_BAD_REQUEST);
     }
 }

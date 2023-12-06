@@ -6,7 +6,7 @@ use KodePandai\ApiResponse\ApiExceptionHandler;
 use Orchestra\Testbench\Exceptions\Handler;
 use Throwable;
 
-class ExceptionHandler extends Handler
+class TestExceptionHandler extends Handler
 {
     public function render($request, Throwable $e)
     {

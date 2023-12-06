@@ -6,10 +6,13 @@ use Illuminate\Support\Facades\Route;
 use KodePandai\ApiResponse\Exceptions\ApiException;
 use KodePandai\ApiResponse\Exceptions\ApiValidationException;
 use KodePandai\ApiResponse\Tests\TestCase;
+
 use function Pest\Laravel\getJson;
 use function Pest\Laravel\postJson;
 
 uses(TestCase::class);
+
+// TODO: add more tests
 
 test('ApiException: exception should return an ApiResponse', function () {
     //
@@ -72,7 +75,7 @@ test('ApiException: can set custom title, message, statusCode and errors', funct
     });
 
     Route::get('custom-three', function () {
-        throw ApiException::error()->withTitle('the next title')->withMessage('the next message');
+        throw ApiException::error()->title('the next title')->message('the next message');
     });
 
     Route::get('custom-four', function () {
@@ -80,7 +83,7 @@ test('ApiException: can set custom title, message, statusCode and errors', funct
     });
 
     Route::get('custom-five', function () {
-        throw ApiException::error()->withStatusCode(Response::HTTP_BAD_GATEWAY);
+        throw ApiException::error()->statusCode(Response::HTTP_BAD_GATEWAY);
     });
 
     Route::get('custom-six', function () {
@@ -88,7 +91,7 @@ test('ApiException: can set custom title, message, statusCode and errors', funct
     });
 
     Route::get('custom-seven', function () {
-        throw ApiException::error()->withErrors(['x' => 1, 'y' => 2]);
+        throw ApiException::error()->errors(['x' => 1, 'y' => 2]);
     });
 
     getJson('custom-one')

@@ -22,7 +22,7 @@ class TestCase extends BaseTestCase
     {
         $app->singleton(
             \Illuminate\Contracts\Debug\ExceptionHandler::class,
-            \KodePandai\ApiResponse\Tests\ExceptionHandler::class,
+            \KodePandai\ApiResponse\Tests\TestExceptionHandler::class,
         );
     }
 }

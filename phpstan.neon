@@ -1,0 +1,13 @@
+parameters:
+  paths:
+    - config
+    - lang
+    - src
+    - tests
+  level: 7 # https://phpstan.org/user-guide/rule-levels
+  checkMissingIterableValueType: false
+  ignoreErrors:
+    - '#Parameter \#1 (.*) of method (.*) expects string\, array\|string\|null given#'
+    - '#Method (.*) should return string but returns array\|string\|null#'
+    - '#Cannot call method toJson\(\) on class\-string\|object#'
+    - '#Cannot call method toArray\(\) on class\-string\|object#'

@@ -10,8 +10,12 @@ class ApiValidationException extends ValidationException implements Responsable
 {
     public function __construct($validator)
     {
-        $response = ApiResponse::unprocessable()
-                               ->errors($validator->errors()->toArray());
+        /** @var ApiResponse $response */
+        $response = app('api-response');
+
+        $response = $response
+            ->unprocessable()
+            ->errors($validator->errors()->toArray());
 
         parent::__construct($validator, $response);
     }
@@ -21,9 +25,9 @@ class ApiValidationException extends ValidationException implements Responsable
         return $this->getResponse();
     }
 
-    public static function invalid(string $key, string $message = null): static
+    public static function invalid(string $key, ?string $message = null): static
     {
-        $message = $message ?: __(':key is invalid.', ['key' => ucfirst($key)]);
+        $message = $message ?: __('api-response::trans.key_is_invalid', ['key' => ucfirst($key)]);
 
         return static::withMessages([$key => [$message]]);
     }

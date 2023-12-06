@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Validator;
 use InvalidArgumentException;
 use KodePandai\ApiResponse\Exceptions\ApiValidationException;
 
-class ApiResponse extends JsonResponse
+class ApiResponse extends JsonResponse implements ApiResponseContract
 {
     protected bool $isSuccess = true;
 
@@ -27,17 +27,17 @@ class ApiResponse extends JsonResponse
 
     public function __construct(string $message = '', string $title = '')
     {
-        $this->title = $title ?: __('Success');
-        $this->message = $message ?: __('Successful');
+        $this->title = $title ?: ('api-response::trans.success');
+        $this->message = $message ?: ('api-response::trans.successful');
 
         parent::__construct();
     }
 
-    public static function validateOrFail(
+    public function validateOrFail(
         array $rules,
         array $messages = [],
         array $customAttributes = [],
-        Request $request = null
+        ?Request $request = null
     ): array {
         //
         $request = $request ?: app(Request::class);
@@ -49,59 +49,59 @@ class ApiResponse extends JsonResponse
         return $validator->validated();
     }
 
-    public static function create(mixed $data = []): static
+    public function create(mixed $data = []): static
     {
-        return (new static)->statusCode(static::HTTP_OK)->data($data);
+        return $this->statusCode(static::HTTP_OK)->data($data);
     }
 
-    public static function success(mixed $data = []): static
+    public function success(mixed $data = []): static
     {
         return static::create($data);
     }
 
-    public static function error(mixed $errors = [], int $statusCode = 500): static
+    public function error(mixed $errors = [], ?int $statusCode = null): static
     {
         return static::create()
             ->notSuccessful()
-            ->title(__('Error'))
-            ->message(__('Oops! Something went wrong.'))
+            ->title(__('api-response::trans.error'))
+            ->message(__('api-response::trans.something_went_wrong'))
             ->errors($errors)
-            ->statusCode($statusCode);
+            ->statusCode($statusCode ?: config('api-response.error_code'));
     }
 
-    public static function notFound(mixed $errors = []): static
+    public function notFound(mixed $errors = []): static
     {
         return static::error($errors, static::HTTP_NOT_FOUND)
-                     ->title(__('Not Found'))
-                     ->message(__('Resource not found.'));
+            ->title(__('api-response::trans.not_found'))
+            ->message(__('api-response::trans.resource_not_found'));
     }
 
-    public static function unprocessable(mixed $errors = []): static
+    public function unprocessable(mixed $errors = []): static
     {
         return static::error($errors, static::HTTP_UNPROCESSABLE_ENTITY)
-                     ->title(__('Validation Error'))
-                     ->message(__('The given data was invalid.'));
+            ->title(__('api-response::trans.validation_error'))
+            ->message(__('api-response::trans.given_data_was_invalid'));
     }
 
-    public static function unauthorized(mixed $errors = []): static
+    public function unauthorized(mixed $errors = []): static
     {
         return static::error($errors, static::HTTP_UNAUTHORIZED)
-                     ->title(__('Unauthorized'))
-                     ->message(__('Your request is unauthorized.'));
+            ->title(__('api-response::trans.unauthorized'))
+            ->message(__('api-response::trans.request_is_unauthorized'));
     }
 
-    public static function forbidden(mixed $errors = []): static
+    public function forbidden(mixed $errors = []): static
     {
         return static::error($errors, static::HTTP_FORBIDDEN)
-                     ->title(__('Forbidden'))
-                     ->message(__('Your request is forbidden.'));
+            ->title(__('api-response::trans.forbidden'))
+            ->message(__('api-response::trans.request_is_forbidden'));
     }
 
-    public static function badRequest(mixed $errors = []): static
+    public function badRequest(mixed $errors = []): static
     {
         return static::error($errors, static::HTTP_BAD_REQUEST)
-                     ->title(__('Bad Request'))
-                     ->message(__('Your request is bad request.'));
+            ->title(__('api-response::trans.bad_request'))
+            ->message(__('api-response::trans.request_is_bad_request'));
     }
 
     public function statusCode(int $code): static
@@ -109,21 +109,16 @@ class ApiResponse extends JsonResponse
         return $this->setStatusCode($code);
     }
 
-    protected function withStatusCode(int $code): static
+    public function getIsSuccess(): bool
     {
-        return $this->setStatusCode($code);
+        return $this->isSuccess;
     }
 
-    protected function setIsSuccess(bool $isSuccess): static
+    public function setIsSuccess(bool $isSuccess): static
     {
         $this->isSuccess = $isSuccess;
 
-        return $this;
-    }
-
-    protected function getIsSuccess(): bool
-    {
-        return $this->isSuccess;
+        return $this->synchronizeData();
     }
 
     public function successful(): static
@@ -136,16 +131,16 @@ class ApiResponse extends JsonResponse
         return $this->setIsSuccess(false);
     }
 
-    protected function setTitle(string $title): static
+    public function getTitle(): string
+    {
+        return $this->title;
+    }
+
+    public function setTitle(string $title): static
     {
         $this->title = $title;
 
-        return $this->syncData();
-    }
-
-    protected function getTitle(): string
-    {
-        return $this->title;
+        return $this->synchronizeData();
     }
 
     public function title(string $title): static
@@ -153,21 +148,16 @@ class ApiResponse extends JsonResponse
         return $this->setTitle($title);
     }
 
-    public function withTitle(string $title): static
+    public function getMessage(): string
     {
-        return $this->setTitle($title);
+        return $this->message;
     }
 
-    protected function setMessage(string $message): static
+    public function setMessage(string $message): static
     {
         $this->message = $message;
 
-        return $this->syncData();
-    }
-
-    protected function getMessage(): string
-    {
-        return $this->message;
+        return $this->synchronizeData();
     }
 
     public function message(string $message): static
@@ -175,21 +165,16 @@ class ApiResponse extends JsonResponse
         return $this->setMessage($message);
     }
 
-    public function withMessage(string $message): static
+    public function getErrors(): array
     {
-        return $this->setMessage($message);
+        return $this->errors;
     }
 
-    protected function setErrors(array $errors): static
+    public function setErrors(array $errors): static
     {
         $this->errors = $errors;
 
-        return $this->syncData();
-    }
-
-    protected function getErrors(): array
-    {
-        return $this->errors;
+        return $this->synchronizeData();
     }
 
     public function errors(array $errors): static
@@ -197,50 +182,7 @@ class ApiResponse extends JsonResponse
         return $this->setErrors($errors);
     }
 
-    public function withErrors(array $errors): static
-    {
-        return $this->setErrors($errors);
-    }
-
-    public function setData(mixed $data = []): static
-    {
-        if (is_array($data)) {
-            $data = $data;
-            //
-        } elseif ($data instanceof ArrayObject) {
-            $data = (array) $data;
-            //
-        } elseif ($data instanceof ResourceCollection) {
-            $data = ($data->resource instanceof AbstractPaginator)
-                ? $data->response()->getData(true)
-                : json_decode($data->toJson(), true);
-            //
-        } elseif ($data instanceof JsonResource || method_exists($data, 'toJson')) {
-            $data = json_decode($data->toJson(), true);
-            //
-        } elseif ($data instanceof Arrayable || method_exists($data, 'toArray')) {
-            $data = $data->toArray();
-            //
-        } else {
-            throw new InvalidArgumentException('Unsupported $data type for API Response');
-        }
-
-        return $this->setOriginalData($data);
-    }
-
-    public function setOriginalData(mixed $data = []): static
-    {
-        $this->originalData = $data;
-
-        return $this->syncData();
-    }
-
-    public function getOriginalData(): mixed
-    {
-        return $this->originalData;
-    }
-
-    protected function syncData(): static
+    public function synchronizeData(): static
     {
         return parent::setData([
             'success' => $this->getIsSuccess(),
@@ -251,13 +193,56 @@ class ApiResponse extends JsonResponse
         ]);
     }
 
-    public function data(mixed $data): static
+    public function getOriginalData(): mixed
     {
-        return $this->setData($data);
+        return $this->originalData;
     }
 
-    public function withData(mixed $data): static
+    public function setOriginalData(mixed $data): static
     {
-        return $this->setData($data);
+        $this->originalData = $this->transformData($data);
+
+        return $this->synchronizeData();
+    }
+
+    public function data(mixed $data): static
+    {
+        return $this->setOriginalData($data);
+    }
+
+    public function transformData(mixed $data = []): array
+    {
+        if (is_array($data)) {
+            $data = $data;
+        //
+        } elseif ($data instanceof ArrayObject) {
+            $data = (array) $data;
+        //
+        } elseif ($data instanceof ResourceCollection) {
+            $data = ($data->resource instanceof AbstractPaginator)
+                ? $data->response()->getData(true)
+                : json_decode($data->toJson(), true);
+        //
+        } elseif ($data instanceof JsonResource || method_exists($data, 'toJson')) {
+            $data = json_decode($data->toJson(), true);
+        //
+        } elseif ($data instanceof Arrayable || method_exists($data, 'toArray')) {
+            $data = $data->toArray();
+        //
+        } else {
+            throw new InvalidArgumentException('Unsupported $data type for API Response');
+        }
+
+        return $data;
+    }
+
+    public function addHeader(string $key, string $value): static
+    {
+        return $this->header($key, $value);
+    }
+
+    public function addHeaders(array $headers): static
+    {
+        return $this->withHeaders($headers);
     }
 }

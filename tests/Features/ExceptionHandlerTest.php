@@ -4,14 +4,16 @@ use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Route;
 use KodePandai\ApiResponse\Exceptions\ApiException;
 use KodePandai\ApiResponse\Tests\TestCase;
+
 use function Pest\Laravel\getJson;
 
 uses(TestCase::class);
 
-return;
+// TODO: add more tests
 
 it('render an api response when exception is thrown', function () {
     //
@@ -23,23 +25,20 @@ it('render an api response when exception is thrown', function () {
         ->assertStatus(Response::HTTP_INTERNAL_SERVER_ERROR)
         ->assertJsonStructure(['success', 'title', 'message', 'data'])
         ->assertJsonStructure(['errors' => ['_traces']])
-        ->assertJsonPath('message', 'Hehehe');
+        ->assertJsonPath('message', 'Hehehe')
+        ->assertSee('ExceptionHandlerTest');
 });
 
-it('does not display message and stack traces on production', function () {
+it('does not display stack traces when debugging turn off', function () {
     //
     Route::get('error', function () {
-        App::detectEnvironment(function () {
-            return 'production';
-        });
-
+        Config::set('api-response.debug.enabled', false);
         throw new InvalidArgumentException('Hihihi');
     });
 
     getJson('error')
         ->assertStatus(Response::HTTP_INTERNAL_SERVER_ERROR)
         ->assertJsonStructure(['success', 'title', 'message', 'data', 'errors'])
-        ->assertJsonPath('message', 'No message in production mode.')
         ->assertDontSee('Hihihi')
         ->assertDontSee('_traces');
 });
@@ -48,7 +47,7 @@ it('does not display traces when 404 not found exception is thrown', function ()
     getJson('404')
         ->assertNotFound()
         ->assertJsonStructure(['success', 'title', 'message', 'data', 'errors'])
-        ->assertJsonPath('message', '404 Not Found.')
+        ->assertJsonPath('message', 'The route 404 could not be found.')
         ->assertDontSee('_traces');
 });
 
@@ -64,27 +63,17 @@ it('can still return json response if exception handler is not configured', func
     });
 
     getJson('eee')
-        ->assertStatus(Response::HTTP_BAD_REQUEST)
+        ->assertStatus(Response::HTTP_INTERNAL_SERVER_ERROR)
         ->assertJsonPath('message', 'Error!');
 });
 
 it('only display traces when response status code in [400, 502, 500]', function () {
     //
-    Route::get('400', function () {
-        return abort(Response::HTTP_BAD_REQUEST);
-    });
-    Route::get('502', function () {
-        return abort(Response::HTTP_BAD_GATEWAY);
-    });
-    Route::get('500', function () {
-        return abort(Response::HTTP_INTERNAL_SERVER_ERROR);
-    });
-    Route::get('404', function () {
-        return abort(Response::HTTP_NOT_FOUND);
-    });
-    Route::get('422', function () {
-        throw abort(Response::HTTP_UNPROCESSABLE_ENTITY);
-    });
+    Route::get('400', fn () => abort(Response::HTTP_BAD_REQUEST));
+    Route::get('502', fn () => abort(Response::HTTP_BAD_GATEWAY));
+    Route::get('500', fn () => abort(Response::HTTP_INTERNAL_SERVER_ERROR));
+    Route::get('404', fn () => abort(Response::HTTP_NOT_FOUND));
+    Route::get('422', fn () => abort(Response::HTTP_UNPROCESSABLE_ENTITY));
 
     getJson('400')
         ->assertStatus(Response::HTTP_BAD_REQUEST)
@@ -135,11 +124,11 @@ it('return 404 for laravel model not found exception', function () {
         ->assertStatus(Response::HTTP_NOT_FOUND)
         ->assertJsonStructure(['success', 'title', 'message', 'data', 'errors'])
         ->assertDontSee('_traces')
-        ->assertJsonPath('message', '404 Not Found.');
+        ->assertJsonPath('message', 'No query for Model X');
 
     getJson('model/2')
         ->assertStatus(Response::HTTP_NOT_FOUND)
         ->assertJsonStructure(['success', 'title', 'message', 'data', 'errors'])
         ->assertDontSee('_traces')
-        ->assertJsonPath('message', '404 Not Found.');
+        ->assertJsonPath('message', 'No query for Model X');
 });

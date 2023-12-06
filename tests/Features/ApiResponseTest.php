@@ -4,22 +4,42 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Route;
-use KodePandai\ApiResponse\ApiResponse;
+use KodePandai\ApiResponse\Facades\ApiResponse;
 use KodePandai\ApiResponse\Tests\TestCase;
+
 use function Pest\Laravel\getJson;
 
 uses(TestCase::class);
 
-return;
+// TODO: add more tests
+
+it('returns correct response status', function () {
+    //
+    Route::get('api-create', fn () => ApiResponse::create());
+    Route::get('api-success', fn () => ApiResponse::success());
+    Route::get('api-error', fn () => ApiResponse::error());
+    Route::get('api-notFound', fn () => ApiResponse::notFound());
+    Route::get('api-unprocessable', fn () => ApiResponse::unprocessable());
+    Route::get('api-unauthorized', fn () => ApiResponse::unauthorized());
+    Route::get('api-forbidden', fn () => ApiResponse::forbidden());
+    Route::get('api-badRequest', fn () => ApiResponse::badRequest());
+
+    getJson('api-create')->assertOk();
+    getJson('api-success')->assertOk();
+    getJson('api-error')->assertInternalServerError();
+    getJson('api-notFound')->assertNotFound();
+    getJson('api-unprocessable')->assertUnprocessable();
+    getJson('api-unauthorized')->assertUnauthorized();
+    getJson('api-forbidden')->assertForbidden();
+    getJson('api-badRequest')->assertBadRequest();
+});
 
 it('returns correct response header', function () {
     //
-    Route::get('api-success', function () {
-        return ApiResponse::success();
-    });
-    Route::get('api-error', function () {
-        return ApiResponse::error();
-    });
+    Route::get('api-success', fn () => ApiResponse::success());
+
+    Route::get('api-error', fn () => ApiResponse::error());
+
     Route::get('api-puck', function () {
         return ApiResponse::create()
             ->statusCode(Response::HTTP_CREATED)
@@ -32,7 +52,7 @@ it('returns correct response header', function () {
         ->assertHeader('content-type', 'application/json');
 
     getJson('api-error')
-        ->assertStatus(Response::HTTP_BAD_REQUEST)
+        ->assertStatus(config('api-response.error_code'))
         ->assertHeader('content-type', 'application/json');
 
     getJson('api-puck')
@@ -52,13 +72,11 @@ it('returns correct json structure for success api response', function () {
 
     getJson('api-puck')
         ->assertStatus(Response::HTTP_OK)
-        ->assertJson([
-            'success' => true,
-            'title' => 'Puck',
-            'message' => 'Puck is awesome',
-            'data' => ['id' => 1, 'name' => 'Puck'],
-            'errors' => [],
-        ]);
+        ->assertJsonPath('success', true)
+        ->assertJsonPath('title', 'Puck')
+        ->assertJsonPath('message', 'Puck is awesome')
+        ->assertJsonPath('data', ['id' => 1, 'name' => 'Puck'])
+        ->assertJsonPath('errors', []);
 });
 
 it('returns correct json structure for error api response', function () {
@@ -75,22 +93,23 @@ it('returns correct json structure for error api response', function () {
 
     getJson('api-error')
         ->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
-        ->assertJson([
-            'success' => false,
-            'title' => 'Error',
-            'message' => 'There is an error.',
-            'data' => [],
-            'errors' => $errors,
-        ]);
+        ->assertJsonPath('success', false)
+        ->assertJsonPath('title', __('Error'))
+        ->assertJsonPath('message', __('Oops! Something went wrong.'))
+        ->assertJsonPath('data', [])
+        ->assertJsonPath('errors', $errors);
 });
 
 it('can handle data of type ResourceCollection|JsonResource|Collection', function () {
+    //
     Route::get('r1', function () {
         return ApiResponse::success(collect(['a' => 'b', 'c' => 'd']));
     });
+
     Route::get('r2', function () {
         return ApiResponse::success(new JsonResource(['x' => 'y', 'z']));
     });
+
     Route::get('r3', function () {
         return ApiResponse::success(new ResourceCollection([
             new JsonResource(['name' => 'Mario']),
@@ -113,8 +132,4 @@ it('can handle data of type ResourceCollection|JsonResource|Collection', functio
 
 it('fails when the argument $data is not valid', function () {
     ApiResponse::success('Yeah!');
-})->throws(InvalidArgumentException::class);
-
-it('fails when the argument $errors is not valid', function () {
-    ApiResponse::error(['X' => [1], 'Y' => 2]);
 })->throws(InvalidArgumentException::class);
