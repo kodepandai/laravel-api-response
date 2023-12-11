@@ -66,7 +66,7 @@ class ApiResponse extends JsonResponse implements ApiResponseContract
             ->title(__('api-response::trans.error'))
             ->message(__('api-response::trans.something_went_wrong'))
             ->errors($errors)
-            ->statusCode($statusCode ?: config('api-response.error_code'));
+            ->statusCode($statusCode ?: config('api-response.error_status_code'));
     }
 
     public function notFound(mixed $errors = []): static
@@ -131,12 +131,12 @@ class ApiResponse extends JsonResponse implements ApiResponseContract
         return $this->setIsSuccess(false);
     }
 
-    public function getTitle(): string
+    protected function getTitle(): string
     {
         return $this->title;
     }
 
-    public function setTitle(string $title): static
+    protected function setTitle(string $title): static
     {
         $this->title = $title;
 
@@ -148,12 +148,12 @@ class ApiResponse extends JsonResponse implements ApiResponseContract
         return $this->setTitle($title);
     }
 
-    public function getMessage(): string
+    protected function getMessage(): string
     {
         return $this->message;
     }
 
-    public function setMessage(string $message): static
+    protected function setMessage(string $message): static
     {
         $this->message = $message;
 
@@ -165,12 +165,12 @@ class ApiResponse extends JsonResponse implements ApiResponseContract
         return $this->setMessage($message);
     }
 
-    public function getErrors(): array
+    protected function getErrors(): array
     {
         return $this->errors;
     }
 
-    public function setErrors(array $errors): static
+    protected function setErrors(array $errors): static
     {
         $this->errors = $errors;
 
@@ -182,7 +182,7 @@ class ApiResponse extends JsonResponse implements ApiResponseContract
         return $this->setErrors($errors);
     }
 
-    public function synchronizeData(): static
+    protected function synchronizeData(): static
     {
         return parent::setData([
             'success' => $this->getIsSuccess(),

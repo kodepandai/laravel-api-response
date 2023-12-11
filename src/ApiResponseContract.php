@@ -43,21 +43,9 @@ interface ApiResponseContract
 
     public function notSuccessful(): static;
 
-    public function getTitle(): string;
-
-    public function setTitle(string $title): static;
-
     public function title(string $title): static;
 
-    public function getMessage(): string;
-
-    public function setMessage(string $message): static;
-
     public function message(string $message): static;
-
-    public function getErrors(): array;
-
-    public function setErrors(array $errors): static;
 
     public function errors(array $errors): static;
 

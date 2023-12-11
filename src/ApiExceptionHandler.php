@@ -2,9 +2,7 @@
 
 namespace KodePandai\ApiResponse;
 
-use Illuminate\Auth\AuthenticationException;
 use Illuminate\Contracts\Support\Responsable;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
@@ -18,12 +16,6 @@ use Throwable;
 
 class ApiExceptionHandler
 {
-    public static array $defaultStatusCodes = [
-        AuthenticationException::class => Response::HTTP_UNAUTHORIZED,
-        ModelNotFoundException::class => Response::HTTP_NOT_FOUND,
-        ValidationException::class => Response::HTTP_UNPROCESSABLE_ENTITY,
-    ];
-
     /**
      * @return Response|JsonResponse
      */
@@ -80,8 +72,10 @@ class ApiExceptionHandler
 
     protected function getStatusCode(Throwable $e, ?Request $request = null): int
     {
-        if (isset(static::$defaultStatusCodes[get_class($e)])) {
-            return static::$defaultStatusCodes[get_class($e)];
+        $codes = config('api-response.exception_status_codes', []);
+
+        if (isset($codes[get_class($e)])) {
+            return $codes[get_class($e)];
         }
 
         if ($e instanceof HttpExceptionInterface || method_exists($e, 'getStatusCode')) {
@@ -97,14 +91,14 @@ class ApiExceptionHandler
             /** @var ValidationException $e as example */
             return method_exists($e->getResponse(), 'getStatusCode')
                 ? $e->getResponse()->getStatusCode()
-                : config('api-response.error_code');
+                : config('api-response.error_status_code');
         }
 
         if (! empty(@Response::$statusTexts[$e->getCode()])) {
             return $e->getCode();
         }
 
-        return config('api-response.error_code');
+        return config('api-response.error_status_code');
     }
 
     protected function getMessage(Throwable $e, ?Request $request = null): string

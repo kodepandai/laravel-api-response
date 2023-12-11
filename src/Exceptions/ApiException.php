@@ -13,7 +13,7 @@ class ApiException extends Exception implements Responsable
 
     public function __construct(string $message = '', string $title = '', ?int $statusCode = null)
     {
-        $defaultCode = config('api-response.error_code', 500);
+        $defaultCode = config('api-response.error_status_code', 500);
 
         /** @var ApiResponse $response */
         $response = app('api-response');
@@ -72,7 +72,7 @@ class ApiException extends Exception implements Responsable
 
     public static function error(string $message = '', string $title = '', ?int $statusCode = null): self
     {
-        return new self($message, $title, $statusCode ?: config('api-response.error_code'));
+        return new self($message, $title, $statusCode ?: config('api-response.error_status_code'));
     }
 
     public static function notFound(string $message = '', string $title = ''): self

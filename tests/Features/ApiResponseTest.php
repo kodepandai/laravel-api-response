@@ -52,7 +52,7 @@ it('returns correct response header', function () {
         ->assertHeader('content-type', 'application/json');
 
     getJson('api-error')
-        ->assertStatus(config('api-response.error_code'))
+        ->assertStatus(config('api-response.error_status_code'))
         ->assertHeader('content-type', 'application/json');
 
     getJson('api-puck')
