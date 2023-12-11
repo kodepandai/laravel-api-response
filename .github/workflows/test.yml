@@ -12,11 +12,13 @@ jobs:
           - laravel: 10.*
             php: 8.2
             testbench: ^8.0
+            pest: ^1.0
             monolog: ^3.0
             stability: prefer-stable
           - laravel: 9.*
             php: 8.1
             testbench: ^7.0
+            pest: ^1.0
             monolog: ^2.0
             stability: prefer-stable
     name: Laravel ${{ matrix.laravel }} with PHP ${{ matrix.php }} - ${{ matrix.stability }}
@@ -35,6 +37,8 @@ jobs:
               "laravel/framework:${{ matrix.laravel }}" \
               "orchestra/testbench:${{ matrix.testbench }}" \
               "monolog/monolog:${{ matrix.monolog }}" \
+              "pestphp/pest:${{ matrix.pest }}" \
+              "pestphp/pest-plugin-laravel:${{ matrix.pest }}" \
             --no-interaction --no-update
           composer update --${{ matrix.stability }} --prefer-dist --no-interaction
       - name: Execute tests
