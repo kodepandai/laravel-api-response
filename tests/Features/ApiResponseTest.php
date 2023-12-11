@@ -24,14 +24,14 @@ it('returns correct response status', function () {
     Route::get('api-forbidden', fn () => ApiResponse::forbidden());
     Route::get('api-badRequest', fn () => ApiResponse::badRequest());
 
-    getJson('api-create')->assertOk();
-    getJson('api-success')->assertOk();
-    getJson('api-error')->assertInternalServerError();
-    getJson('api-notFound')->assertNotFound();
-    getJson('api-unprocessable')->assertUnprocessable();
-    getJson('api-unauthorized')->assertUnauthorized();
-    getJson('api-forbidden')->assertForbidden();
-    getJson('api-badRequest')->assertBadRequest();
+    getJson('api-create')->assertStatus(Response::HTTP_OK);
+    getJson('api-success')->assertStatus(Response::HTTP_OK);
+    getJson('api-error')->assertStatus(Response::HTTP_INTERNAL_SERVER_ERROR);
+    getJson('api-notFound')->assertStatus(Response::HTTP_NOT_FOUND);
+    getJson('api-unprocessable')->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
+    getJson('api-unauthorized')->assertStatus(Response::HTTP_UNAUTHORIZED);
+    getJson('api-forbidden')->assertStatus(Response::HTTP_FORBIDDEN);
+    getJson('api-badRequest')->assertStatus(Response::HTTP_BAD_REQUEST);
 });
 
 it('returns correct response header', function () {
