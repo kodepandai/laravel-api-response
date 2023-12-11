@@ -104,6 +104,15 @@ class ApiResponse extends JsonResponse implements ApiResponseContract
             ->message(__('api-response::trans.request_is_bad_request'));
     }
 
+    public function invalid(string $key, string|array $messages): static
+    {
+        $messages = is_string($messages) ? [$messages] : $messages;
+
+        return static::error([$key => $messages], static::HTTP_UNPROCESSABLE_ENTITY)
+            ->title(__('api-response::trans.validation_error'))
+            ->message(__('api-response::trans.given_data_was_invalid'));
+    }
+
     public function statusCode(int $code): static
     {
         return $this->setStatusCode($code);

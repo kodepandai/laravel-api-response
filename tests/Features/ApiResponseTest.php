@@ -23,6 +23,7 @@ it('returns correct response status', function () {
     Route::get('api-unauthorized', fn () => ApiResponse::unauthorized());
     Route::get('api-forbidden', fn () => ApiResponse::forbidden());
     Route::get('api-badRequest', fn () => ApiResponse::badRequest());
+    Route::get('api-invalid', fn () => ApiResponse::invalid('key', []));
 
     getJson('api-create')->assertStatus(Response::HTTP_OK);
     getJson('api-success')->assertStatus(Response::HTTP_OK);
@@ -32,6 +33,7 @@ it('returns correct response status', function () {
     getJson('api-unauthorized')->assertStatus(Response::HTTP_UNAUTHORIZED);
     getJson('api-forbidden')->assertStatus(Response::HTTP_FORBIDDEN);
     getJson('api-badRequest')->assertStatus(Response::HTTP_BAD_REQUEST);
+    getJson('api-invalid')->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
 });
 
 it('returns correct response header', function () {
@@ -88,16 +90,38 @@ it('returns correct json structure for error api response', function () {
 
     Route::get('api-error', function () use ($errors) {
         return ApiResponse::error($errors)
-            ->statusCode(Response::HTTP_UNPROCESSABLE_ENTITY);
+            ->statusCode(Response::HTTP_GATEWAY_TIMEOUT);
     });
 
     getJson('api-error')
-        ->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
+        ->assertStatus(Response::HTTP_GATEWAY_TIMEOUT)
         ->assertJsonPath('success', false)
-        ->assertJsonPath('title', __('Error'))
-        ->assertJsonPath('message', __('Oops! Something went wrong.'))
+        ->assertJsonPath('title', __('api-response::trans.error'))
+        ->assertJsonPath('message', __('api-response::trans.something_went_wrong'))
         ->assertJsonPath('data', [])
         ->assertJsonPath('errors', $errors);
+});
+
+it('returns correct json structure for invalid api response', function () {
+    //
+    $messages = [
+        'Age must be a number',
+        'Age must be between 10-20',
+    ];
+
+    Route::get('api-invalid', function () use ($messages) {
+        return ApiResponse::invalid('age', $messages)
+            ->statusCode(Response::HTTP_UNPROCESSABLE_ENTITY);
+    });
+
+    getJson('api-invalid')
+        ->dump()
+        ->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
+        ->assertJsonPath('success', false)
+        ->assertJsonPath('title', __('api-response::trans.validation_error'))
+        ->assertJsonPath('message', __('api-response::trans.given_data_was_invalid'))
+        ->assertJsonPath('data', [])
+        ->assertJsonPath('errors', ['age' => $messages]);
 });
 
 it('can handle data of type ResourceCollection|JsonResource|Collection', function () {
