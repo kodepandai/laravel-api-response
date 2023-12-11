@@ -12,12 +12,12 @@ jobs:
           - laravel: 10.*
             php: 8.2
             testbench: ^8.0
-            monolog: ^3.0,
+            monolog: ^3.0
             stability: prefer-stable
           - laravel: 9.*
             php: 8.1
             testbench: ^7.0
-            monolog: ^2.0,
+            monolog: ^2.0
             stability: prefer-stable
     name: Laravel ${{ matrix.laravel }} with PHP ${{ matrix.php }} - ${{ matrix.stability }}
     steps:
