@@ -1,9 +1,6 @@
 <?php
 
-use Illuminate\Auth\AuthenticationException;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Response;
-use Illuminate\Validation\ValidationException;
 
 return [
 
@@ -18,16 +15,16 @@ return [
      * - return ApiResponse::error()..
      * - throw new ApiException('error')..
      */
-    'error_status_code' => \Illuminate\Http\Response::HTTP_INTERNAL_SERVER_ERROR,
+    'error_status_code' => Response::HTTP_INTERNAL_SERVER_ERROR,
 
     /**
      * List of exception status codes.
      * Override the default status code with custom one.
      */
     'exception_status_codes' => [
-        AuthenticationException::class => Response::HTTP_UNAUTHORIZED,
-        ModelNotFoundException::class => Response::HTTP_NOT_FOUND,
-        ValidationException::class => Response::HTTP_UNPROCESSABLE_ENTITY,
+        \Illuminate\Auth\AuthenticationException::class => Response::HTTP_UNAUTHORIZED,
+        \Illuminate\Database\Eloquent\ModelNotFoundException::class => Response::HTTP_NOT_FOUND,
+        \Illuminate\Validation\ValidationException::class => Response::HTTP_UNPROCESSABLE_ENTITY,
     ],
 
     /**
@@ -46,9 +43,9 @@ return [
          * *Set to false to not show in all status codes.
          */
         'show_traces_in_codes' => [
-            \Illuminate\Http\Response::HTTP_BAD_GATEWAY,
-            \Illuminate\Http\Response::HTTP_BAD_REQUEST,
-            \Illuminate\Http\Response::HTTP_INTERNAL_SERVER_ERROR,
+            Response::HTTP_BAD_GATEWAY,
+            Response::HTTP_BAD_REQUEST,
+            Response::HTTP_INTERNAL_SERVER_ERROR,
         ],
 
         /**

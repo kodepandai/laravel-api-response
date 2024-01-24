@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static \KodePandai\ApiResponse\ApiResponse forbidden(mixed $errors = [])
  * @method static \KodePandai\ApiResponse\ApiResponse badRequest(mixed $errors = [])
  * @method static \KodePandai\ApiResponse\ApiResponse invalid(string $key, string|array $messages)
+ * @method static \KodePandai\ApiResponse\ApiResponse validateOrFail(array $rules, array $messages, array $customAttributes, ?\Illuminate\Http\Request $request): array
  * @method \KodePandai\ApiResponse\ApiResponse statusCode(int $code)
  * @method \KodePandai\ApiResponse\ApiResponse successful()
  * @method \KodePandai\ApiResponse\ApiResponse notSuccessful()
