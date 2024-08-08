@@ -27,8 +27,8 @@ class ApiResponse extends JsonResponse implements ApiResponseContract
 
     public function __construct(string $message = '', string $title = '')
     {
-        $this->title = $title ?: ('api-response::trans.success');
-        $this->message = $message ?: ('api-response::trans.successful');
+        $this->title = $title ?: __('api-response::trans.success');
+        $this->message = $message ?: __('api-response::trans.successful');
 
         parent::__construct();
     }
