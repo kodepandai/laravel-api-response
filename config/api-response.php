@@ -28,6 +28,12 @@ return [
     ],
 
     /**
+     * Transform \Illuminate\Validation\ValidationException response
+     *  into ApiValidationException response to standarize the error.
+     */
+    'transform_validation_exception' => true,
+
+    /**
      * Debugging options
      */
     'debug' => [

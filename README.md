@@ -40,12 +40,38 @@ Example:
 ## Install
 
 ```sh
-$ composer require kodepandai/laravel-api-response:^2.0
+$ composer require kodepandai/laravel-api-response:dev-beta
 ```
 
 **Requirements:**
 * PHP ^8.1
 * Laravel ^10.0
+
+**Laravel ^11**
+
+After installation, register api response handler in `bootstrap/app.php`
+
+```php
+use KodePandai\ApiResponse\ApiExceptionHandler;
+
+return Application::configure(basePath: dirname(__DIR__))
+    //...
+    ->withExceptions(function (Exceptions $exceptions) {
+        // dont report any api response exception
+        $exceptions->dontReport([
+            \KodePandai\ApiResponse\Exceptions\ApiException::class,
+            \KodePandai\ApiResponse\Exceptions\ApiValidationException::class,
+        ]);
+        // api response exception handler for /api
+        $exceptions->renderable(function (Throwable $e, Request $request) {
+            if ($request->wantsJson() || $request->is('*api*')) {
+                return ApiExceptionHandler::render($e, $request);
+            }
+        });
+    });
+```
+
+**Laravel ^10**
 
 After installation, register api response handler in `app/Exceptions/Handler.php`
 
@@ -70,7 +96,7 @@ class Handler extends ExceptionHandler
 }
 ```
 
-The above handler will automatically transform any exception and render as ApiResponse.
+The above handler will automatically transform any exception and render as ApiResponse json response.
 
 ## Config
 
@@ -82,9 +108,19 @@ $ php artisan vendor:publish --tag=api-response-config
 
 ## Usage
 
+TODO
+
 ### Return Response
 
+TODO
+
 ### Throw Exception
+
+TODO
+
+### Overriding response structure
+
+TODO
 
 ## Develop
 

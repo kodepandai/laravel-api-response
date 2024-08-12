@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use KodePandai\ApiResponse\Exceptions\ApiException;
 use KodePandai\ApiResponse\Exceptions\ApiValidationException;
+use KodePandai\ApiResponse\Facades\ApiResponse;
 use ReflectionMethod;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -23,8 +24,14 @@ class ApiExceptionHandler
     {
         $request = $request ?: app(Request::class);
 
-        if ($e instanceof ApiException || $e instanceof ApiValidationException) {
+        if ($e instanceof ApiException
+            || $e instanceof ApiValidationException) {
             return $e->toResponse($request);
+        }
+
+        if ($e instanceof ValidationException
+            && config('api-response.transform_validation_exception')) {
+            return ApiResponse::unprocessable()->errors($e->errors());
         }
 
         if ($e instanceof Responsable) {
